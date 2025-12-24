@@ -1,516 +1,350 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<title>Krystal Grand · Lobby</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Carta de Santa · Equipo y Líderes</title>
+  <style>
+    :root{
+      --bg1:#071a33;
+      --bg2:#0b2a52;
+      --ink:#2b1f12;
+      --paper:#f3e6c8;
+      --paper2:#e8d7b1;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(255,255,255,.06), transparent 60%),
+        radial-gradient(900px 500px at 80% 0%, rgba(255,255,255,.05), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
 
-<style>
-body{
-  margin:0;
-  font-family: Arial, Helvetica, sans-serif;
-  background:#0e1621;
-  color:#eaf2ff;
-}
+    /* Fondo con estrellas suaves */
+    .stars{
+      position:fixed; inset:0;
+      pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.55), transparent 55%),
+        radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,.45), transparent 55%),
+        radial-gradient(1px 1px at 55% 35%, rgba(255,255,255,.5), transparent 55%),
+        radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,.45), transparent 55%),
+        radial-gradient(1px 1px at 90% 15%, rgba(255,255,255,.4), transparent 55%);
+      opacity:.55;
+      mix-blend-mode:screen;
+      z-index:0;
+    }
 
-/* HEADER */
-.topbar{
-  max-width:1400px;
-  margin:16px auto;
-  padding:14px 18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-  border-radius:18px;
-  background:linear-gradient(180deg, rgba(16,25,38,.95), rgba(16,25,38,.75));
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 14px 30px rgba(0,0,0,.45);
-}
+    /* Santa volando (detrás del pergamino) */
+    .santa-layer{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1; /* detrás del pergamino */
+      overflow:hidden;
+    }
+    .santa{
+      position:absolute;
+      top: 10vh;
+      left: -30vw;
+      width: min(520px, 70vw);
+      opacity: .92;
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,.35));
+      animation: fly 18s linear infinite, bob 2.8s ease-in-out infinite;
+      will-change: transform;
+    }
+    @keyframes fly{
+      0%   { transform: translateX(-35vw) translateY(0) scale(1); }
+      100% { transform: translateX(145vw) translateY(0) scale(1); }
+    }
+    @keyframes bob{
+      0%,100% { margin-top: 0px; }
+      50%     { margin-top: 14px; }
+    }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-.brand img{
-  height:50px;
-  border-radius:10px;
-  background:#fff;
-  padding:4px;
-}
-.brand-title{
-  font-size:20px;
-  font-weight:800;
-}
-.brand-sub{
-  font-size:12px;
-  color:#9fb3d9;
-  letter-spacing:.08em;
-}
+    /* Nieve (más abundante) */
+    .snow{
+      position:fixed; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:4; /* encima de todo */
+    }
+    .flake{
+      position:absolute;
+      top:-12vh;
+      border-radius:50%;
+      background:rgba(255,255,255,.9);
+      filter: blur(.25px);
+      animation: fall linear infinite, sway ease-in-out infinite;
+      will-change: transform;
+    }
+    @keyframes fall{ to{ transform: translateY(125vh); } }
+    @keyframes sway{
+      0%,100%{ margin-left:0 }
+      50%{ margin-left:50px }
+    }
 
-.nav-links{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+    /* Contenedor */
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 32px 16px 56px;
+      position:relative;
+      z-index:3; /* arriba de santa */
+    }
 
-.tab-link{
-  padding:8px 14px;
-  border-radius:14px;
-  text-decoration:none;
-  font-weight:600;
-  font-size:13px;
-  color:#eaf6ff;
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.15);
-  transition:all .25s ease;
-}
+    /* Pergamino */
+    .scroll{
+      width:min(920px, 96vw);
+      background:
+        radial-gradient(900px 260px at 50% 10%, rgba(255,255,255,.22), transparent 60%),
+        radial-gradient(650px 240px at 50% 90%, rgba(0,0,0,.08), transparent 65%),
+        linear-gradient(180deg, var(--paper), var(--paper2));
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      position:relative;
+      padding: 42px 26px;
+      transform-origin: center;
+      animation: open 900ms cubic-bezier(.2,.9,.2,1) both;
+    }
+    @keyframes open{
+      from{ transform: scale(.92) translateY(12px); opacity:0 }
+      to{ transform: scale(1) translateY(0); opacity:1 }
+    }
 
-.tab-link:hover{
-  background:rgba(0,255,180,0.2);
-  border-color:rgba(0,255,180,0.5);
-}
+    /* Bordes envejecidos */
+    .scroll:before, .scroll:after{
+      content:"";
+      position:absolute;
+      inset: 10px;
+      border-radius: 22px;
+      border: 2px solid rgba(120,80,30,.35);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,.12),
+        inset 0 0 22px rgba(80,40,10,.18);
+      pointer-events:none;
+    }
+    .scroll:after{
+      inset: 22px;
+      border: 1px dashed rgba(120,80,30,.25);
+      opacity:.9;
+    }
 
-.datetime{
-  font-size:14px;
-  font-weight:700;
-  letter-spacing:.08em;
-}
+    /* Barras del pergamino (arriba/abajo) */
+    .rod{
+      position:absolute;
+      left: 18px;
+      right: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(95,55,18,.85), rgba(170,110,45,.92), rgba(95,55,18,.85));
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+      opacity:.95;
+    }
+    .rod.top{ top: 14px; }
+    .rod.bottom{ bottom: 14px; }
 
-/* LOBBY BLANCO */
-.lobby{
-  max-width:1000px;
-  margin:40px auto;
-  padding:26px;
-  border-radius:20px;
-  background:rgba(10,18,26,.55);
-  border:1px solid rgba(255,255,255,.1);
-  box-shadow:0 14px 40px rgba(0,0,0,.45);
-}
+    header{
+      text-align:center;
+      padding: 6px 10px 18px;
+    }
 
-footer{
-  max-width:1400px;
-  margin:28px auto 10px;
-  padding-top:14px;
-  border-top:1px solid rgba(255,255,255,.12);
-  text-align:center;
-  font-size:12px;
-  color:#a9b6d3;
-}
+    /* Logo Krystal */
+    .brand{
+      display:flex;
+      justify-content:center;
+      margin: 2px 0 10px;
+    }
+    .brand img{
+      width: min(210px, 55vw);
+      height:auto;
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    }
 
-/* LOBBY GRID */
-.lobby{ max-width:1200px; }
-.lobby-grid{
-  display:grid;
-  grid-template-columns: 380px 1fr;
-  gap:18px;
-  align-items:start;
-}
-.lobby-left{ display:flex; flex-direction:column; gap:14px; }
-.panel{
-  border-radius:18px;
-  padding:16px;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.10);
-  box-shadow:0 10px 26px rgba(0,0,0,.35);
-}
-.panel-title{ font-weight:800; letter-spacing:.02em; }
-.panel-sub{ margin-top:6px; color:#9fb3d9; font-size:12.5px; line-height:1.45; }
-.panel-actions{ margin-top:10px; }
-.mini-link{
-  display:inline-block;
-  padding:8px 12px;
-  border-radius:14px;
-  text-decoration:none;
-  font-weight:700;
-  font-size:12px;
-  color:#eaf6ff;
-  background:rgba(0,255,180,0.10);
-  border:1px solid rgba(0,255,180,0.22);
-}
-.mini-link:hover{
-  background:rgba(0,255,180,0.18);
-  border-color:rgba(0,255,180,0.40);
-}
-.placeholder{
-  margin-top:12px;
-  border-radius:14px;
-  padding:12px;
-  background:rgba(10,18,26,.45);
-  border:1px dashed rgba(255,255,255,.18);
-  color:#cfe0ff;
-  font-size:12.5px;
-  line-height:1.5;
-}
-.lobby-right .stage{
-  border-radius:20px;
-  padding:22px;
-  background:rgba(10,18,26,.35);
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow:0 14px 40px rgba(0,0,0,.35);
-  min-height:360px;
-}
-.stage-title{ font-size:22px; font-weight:900; letter-spacing:.04em; }
-.stage-sub{ margin-top:6px; color:#9fb3d9; font-size:13px; }
-.stage-note{
-  margin-top:16px;
-  color:#cfe0ff;
-  font-size:12.5px;
-  line-height:1.55;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:16px;
-  padding:12px 14px;
-}
+    .seal{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-size:12px;
+      padding:10px 14px;
+      border-radius:999px;
+      background: linear-gradient(180deg, rgba(215,180,106,.95), rgba(165,120,55,.95));
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+    }
+    .seal .dot{
+      width:10px; height:10px; border-radius:50%;
+      background:rgba(255,255,255,.9);
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,.12);
+    }
 
-/* Responsive */
-@media (max-width: 980px){
-  .lobby-grid{ grid-template-columns: 1fr; }
-}
+    h1{
+      margin: 18px 0 8px;
+      font-size: clamp(22px, 3.2vw, 34px);
+      font-weight: 800;
+      color:#2a1b0f;
+    }
+    .sub{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: rgba(43,31,18,.75);
+      font-size: 14px;
+    }
 
+    .letter{
+      padding: 6px 14px 10px;
+      line-height: 1.65;
+      font-size: clamp(16px, 1.6vw, 18px);
+      white-space: pre-wrap;
+    }
+    .signature{
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(120,80,30,.25);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+    .sig-left{ font-size: 15px; }
+    .sig-right{
+      text-align:right;
+      font-family: "Brush Script MT", "Segoe Script", "Apple Chancery", cursive;
+      font-size: 28px;
+      color: rgba(60,30,10,.9);
+    }
 
-/* --- Widget Pulidos (mini dashboard dentro del Lobby) --- */
-.pulidos-widget{
-  margin-top:14px;
-  border-radius:18px;
-  padding:14px 14px 12px;
-  background:linear-gradient(180deg, rgba(16,25,38,.85), rgba(16,25,38,.55));
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-}
-.pw-title{
-  font-weight:900;
-  letter-spacing:.08em;
-  font-size:13px;
-  margin-bottom:10px;
-}
-.pw-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:10px;
-  font-size:13px;
-}
-.pw-label{ color:#eaf2ff; }
-.pw-val{ color:#eaf2ff; font-weight:800; }
-.pw-bar{
-  height:10px;
-  border-radius:999px;
-  background:rgba(255,255,255,.10);
-  border:1px solid rgba(255,255,255,.08);
-  overflow:hidden;
-  margin-top:8px;
-}
-.pw-fill{
-  height:100%;
-  border-radius:999px;
-  background:linear-gradient(90deg, rgba(47,199,152,.55), rgba(47,199,152,.95));
-}
-.pw-sub{
-  margin-top:14px;
-  padding-top:12px;
-  border-top:1px solid rgba(255,255,255,.10);
-  color:#cfe0ff;
-  font-size:12px;
-  letter-spacing:.02em;
-}
-
-.pw-donut-wrap{
-  margin-top:10px;
-  display:grid;
-  grid-template-columns: 160px 1fr;
-  gap:12px;
-  align-items:center;
-}
-
-.pw-donut{
-  width:160px;
-  height:160px;
-  border-radius:50%;
-  background:
-    conic-gradient(
-      rgba(47,199,152,.95) 0 21%,
-      rgba(166,112,255,.95) 21% 48%,
-      rgba(255,88,112,.95) 48% 100%
-    );
-  position:relative;
-  box-shadow:0 12px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
-}
-.pw-donut::after{
-  content:"";
-  position:absolute;
-  inset:22px;
-  border-radius:50%;
-  background:rgba(16,25,38,.92);
-  border:1px solid rgba(255,255,255,.08);
-}
-.pw-donut-center{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  z-index:2;
-  text-align:center;
-}
-.pw-donut-big{ font-size:22px; font-weight:900; }
-.pw-donut-small{ font-size:12px; color:#9fb3d9; margin-top:2px; }
-
-.pw-legend{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.pw-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:16px;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.08);
-}
-.pw-dot{
-  width:11px; height:11px;
-  border-radius:50%;
-  box-shadow:0 0 0 4px rgba(255,255,255,.06);
-}
-.dot-alt{ background:rgba(47,199,152,.95); }
-.dot-uni{ background:rgba(166,112,255,.95); }
-.dot-pen{ background:rgba(255,88,112,.95); }
-
-.pw-name{ flex:1; font-size:12.5px; color:#eaf2ff; }
-.pw-num{ font-weight:900; font-size:12.5px; }
-
-.pw-foot{
-  margin-top:10px;
-  color:#9fb3d9;
-  font-size:12px;
-  line-height:1.4;
-}
-
-@media (max-width: 980px){
-  .pw-donut-wrap{ grid-template-columns: 1fr; }
-  .pw-donut{ margin:0 auto; }
-}
-
-
-/* --- FIX ESPACIADO WIDGET PULIDOS (SIN MOVER TEXTOS) --- */
-.pulidos-widget,
-.pulidos-widget *{
-  box-sizing: border-box;
-}
-
-.pulidos-widget{
-  padding:12px 12px 10px;
-}
-
-.pw-donut-wrap{
-  grid-template-columns: 140px 1fr; /* antes 160px */
-  gap:10px;
-}
-
-.pw-donut{
-  width:140px;
-  height:140px;
-}
-
-.pw-donut::after{
-  inset:20px; /* anillo un poco más delgado */
-}
-
-.pw-item{
-  padding:8px 10px;
-}
-
-.pw-foot{
-  margin-top:8px;
-  font-size:11.5px;
-}
-
-
-/* --- Reloj + fecha (header) --- */
-.datetime{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  min-width: 210px;
-  font-size:14px;
-  font-weight:800;
-  letter-spacing:.06em;
-  color:#eaf2ff;
-  white-space:nowrap;
-}
-
-</style>
+    /* Impresión: solo el pergamino */
+    @media print{
+      body{ background:#fff; }
+      .snow,.stars,.santa-layer{ display:none !important; }
+      .wrap{ padding:0; }
+      .scroll{ box-shadow:none; width:100%; border-radius:0; }
+      .rod{ display:none; }
+      .scroll:before,.scroll:after{ display:none; }
+      .brand img{ box-shadow:none; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="stars" aria-hidden="true"></div>
 
-<header class="topbar">
-  <div class="brand">
-    <img src="https://res.cloudinary.com/dor6za85u/image/upload/v1765651460/Krystal_Grand_wo1rbs.jpg" />
-    <div>
-      <div class="brand-title">Krystal Grand · División Cuartos</div>
-      <div class="brand-sub">Portal Operativo</div>
-    </div>
+  <div class="santa-layer" aria-hidden="true">
+    <img class="santa" alt="" src="https://res.cloudinary.com/dor6za85u/image/upload/v1766586685/Santa_Claus_hadcxt.png">
   </div>
 
-  
-  <div class="nav-links">
-    <a class="tab-link" href="https://hernaldluis.github.io/checklist-camaristas-krystal/" target="_blank">
-      Check List Habitación
-    </a>
-    <a class="tab-link" href="https://hernaldluis.github.io/krystal-grand-division-cuartos/" target="_blank">
-      Hab. Pulidos
-    </a>
-    <div class="datetime" id="clock">--/--/---- · --:--:--</div>
-  </div>
+  <div class="snow" aria-hidden="true" id="snow"></div>
 
-</header>
+  <main class="wrap">
+    <section class="scroll" role="article" aria-label="Carta de Santa">
+      <div class="rod top" aria-hidden="true"></div>
+      <div class="rod bottom" aria-hidden="true"></div>
 
-
-<section class="lobby">
-  <div class="lobby-grid">
-    <aside class="lobby-left">
-      <div class="panel">
-        <div class="panel-title">Resumen · Pulidos</div>
-        <div class="panel-sub">Aquí vamos a ir metiendo las representaciones gráficas (por torre, % avance, pendientes, etc.).</div>
-        <div class="panel-actions">
-          <a class="mini-link" href="https://hernaldluis.github.io/krystal-grand-division-cuartos/" target="_blank">Abrir módulo Pulidos</a>
-        </div>
-        <div class="placeholder">
-
-      <div class="pulidos-widget">
-        <div class="pw-title">AVANCE DE PULIDOS</div>
-
-        <div class="pw-row">
-          <div class="pw-label">General</div>
-          <div class="pw-val" id="pw_general_txt">48%</div>
-        </div>
-        <div class="pw-bar"><div class="pw-fill" id="pw_general_bar" style="width:48%"></div></div>
-
-        <div class="pw-row">
-          <div class="pw-label">Altitude</div>
-          <div class="pw-val" id="pw_alt_txt">100%</div>
-        </div>
-        <div class="pw-bar"><div class="pw-fill" id="pw_alt_bar" style="width:100%"></div></div>
-
-        <div class="pw-row">
-          <div class="pw-label">Palmilla</div>
-          <div class="pw-val" id="pw_pal_txt">0%</div>
-        </div>
-        <div class="pw-bar"><div class="pw-fill" id="pw_pal_bar" style="width:0%"></div></div>
-
-        <div class="pw-row">
-          <div class="pw-label">Unique</div>
-          <div class="pw-val" id="pw_uni_txt">47%</div>
-        </div>
-        <div class="pw-bar"><div class="pw-fill" id="pw_uni_bar" style="width:47%"></div></div>
-
-        <div class="pw-sub">Distribución de avance</div>
-
-        <div class="pw-donut-wrap">
-          <div class="pw-donut" id="pw_donut">
-            <div class="pw-donut-center">
-              <div class="pw-donut-big" id="pw_donut_big">48%</div>
-              <div class="pw-donut-small">Pulidos</div>
-            </div>
-          </div>
-
-          <div class="pw-legend">
-            <div class="pw-item">
-              <span class="pw-dot dot-alt"></span>
-              <span class="pw-name">Altitude pulidas</span>
-              <span class="pw-num" id="pw_leg_alt">21%</span>
-            </div>
-            <div class="pw-item">
-              <span class="pw-dot dot-uni"></span>
-              <span class="pw-name">Unique pulidas</span>
-              <span class="pw-num" id="pw_leg_uni">27%</span>
-            </div>
-            <div class="pw-item">
-              <span class="pw-dot dot-pen"></span>
-              <span class="pw-name">Pendientes</span>
-              <span class="pw-num" id="pw_leg_pen">52%</span>
-            </div>
-          </div>
+      <header>
+        <div class="brand">
+          <img src="https://res.cloudinary.com/dor6za85u/image/upload/v1765651460/Krystal_Grand_wo1rbs.jpg" alt="Krystal Grand" />
         </div>
 
-        <div class="pw-foot" id="pw_foot">
-          General: 156/327 · Altitude: 68/68 · Palmilla: 0/72 · Unique: 88/187
-        </div>
+        <div class="seal"><span class="dot"></span> Polo Norte · Mensaje Oficial <span class="dot"></span></div>
+        <h1>🎄 Carta de Santa 🎅</h1>
+        <p class="sub">Para todo el equipo y líderes · Felices fiestas</p>
+      </header>
+
+      <div class="letter" id="letter">
+Querido equipo y líderes,
+
+¡Ho, ho, hooo!
+Desde el Polo Norte he estado muy atento… no solo a las cartas, sino al esfuerzo, la entrega y el corazón que ponen cada día en su trabajo.
+
+He visto madrugadas, retos superados, apoyo entre compañeros y liderazgo que inspira incluso cuando el cansancio aparece.
+Y déjenme decirles algo muy importante: eso también es magia.
+
+La Navidad no se trata solo de luces y regalos,
+sino de personas comprometidas, unidas y con la voluntad de dar siempre un poco más.
+Cada uno de ustedes aporta algo único que hace que el equipo funcione y que los logros se sientan aún más especiales.
+
+No olvidemos cuidar a quienes nos eligen.
+Cada huésped es un regalo que confía en nosotros como su hogar, y con atención, seguimiento y calidez, convertimos su experiencia en un recuerdo positivo.
+Porque ya lo dice Santa… un huésped bien atendido vuelve, recomienda y hasta deja galletas 🍪😉
+
+Que esta época esté llena de paz, alegría y momentos para sonreír.
+Recarguen energía, abracen los logros alcanzados y prepárense para un nuevo año lleno de oportunidades, retos y muchas razones para seguir creyendo.
+
+Gracias por hacer que la magia exista todos los días.
+
+¡Ho, ho, hooo… y Feliz Navidad! 🎄✨
+
+Con todo mi reconocimiento,
+
+🎅 Santa Claus
       </div>
 
-</div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-title">Resumen · Check List</div>
-        <div class="panel-sub">Más adelante: totales de checklist, últimas habitaciones auditadas, etc.</div>
-        <div class="panel-actions">
-          <a class="mini-link" href="https://hernaldluis.github.io/checklist-camaristas-krystal/" target="_blank">Abrir Check List</a>
+      <div class="signature">
+        <div class="sig-left">
+          <strong>✨ Que la magia te acompañe</strong><br/>
+          <span style="opacity:.85;">— Mensaje para compartir con todo el equipo</span>
         </div>
-        <div class="placeholder">
-          (Pendiente) Indicadores del checklist (cuando conectemos datos).
-        </div>
+        <div class="sig-right">Santa</div>
       </div>
-    </aside>
+    </section>
+  </main>
 
-    <main class="lobby-right">
-      <div class="stage">
-        <div class="stage-title">LOBBY</div>
-        <div class="stage-sub">Zona libre para ir agregando módulos paso a paso.</div>
+  <script>
+    // Nieve (más abundante y variada)
+    const snow = document.getElementById('snow');
+    const FLAKES = 140; // MÁS NIEVE
+    function rand(min, max){ return Math.random()*(max-min)+min; }
 
-        <div class="stage-note">
-          Nota: Si quieres “replicar” el portal de Pulidos aquí dentro, se puede intentar con un <b>iframe</b>,
-          pero depende de que esa página permita ser embebida (algunos sitios lo bloquean). La alternativa pro es
-          conectar datos (JSON/Sheets/Supabase) y pintar aquí los gráficos.
-        </div>
-      </div>
-    </main>
-  </div>
-</section>
+    function createFlakes(){
+      snow.innerHTML = '';
+      for(let i=0;i<FLAKES;i++){
+        const f = document.createElement('div');
+        f.className = 'flake';
 
+        const size = rand(2, 10);
+        f.style.width = size + 'px';
+        f.style.height = size + 'px';
 
-<footer>
-  Formato de apoyo a la operación del Departamento de Ama de Llaves — Krystal Grand Los Cabos.<br>
-  Responsable operativo: <strong>Luis Hernaldo</strong>, Asistente de Ama de Llaves.<br>
-  <span style="letter-spacing:.15em;">JULU®</span>
-</footer>
+        f.style.left = rand(0, 100) + 'vw';
 
+        const fallDur = rand(6.5, 16);
+        const swayDur = rand(2.2, 6.2);
+        const delay = rand(0, 10);
 
+        f.style.animationDuration = `${fallDur}s, ${swayDur}s`;
+        f.style.animationDelay = `${delay}s, ${rand(0,2)}s`;
+        f.style.opacity = rand(0.45, 0.98);
 
-<script>
-function updateClock(){
-  const now = new Date();
+        // Algunas nieves más “suaves”
+        if (Math.random() < 0.35){
+          f.style.filter = 'blur(1px)';
+          f.style.opacity = rand(0.25, 0.6);
+        }
 
-  // Fecha: dd/mm/yyyy
-  const dd = String(now.getDate()).padStart(2,'0');
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const yyyy = now.getFullYear();
+        snow.appendChild(f);
+      }
+    }
 
-  // Hora con segundos y a.m./p.m.
-  let h = now.getHours();
-  const ampm = (h >= 12) ? 'p.m.' : 'a.m.';
-  h = h % 12; if(h === 0) h = 12;
+    createFlakes();
 
-  const hh = String(h).padStart(2,'0');
-  const mi = String(now.getMinutes()).padStart(2,'0');
-  const ss = String(now.getSeconds()).padStart(2,'0');
-
-  const txt = `${dd}/${mm}/${yyyy} · ${hh}:${mi}:${ss} ${ampm}`;
-  const el = document.getElementById('clock');
-  if(el) el.textContent = txt;
-}
-updateClock();
-setInterval(updateClock, 1000);
-</script>
-
-
+    let t;
+    window.addEventListener('resize', () => {
+      clearTimeout(t);
+      t = setTimeout(createFlakes, 150);
+    });
+  </script>
 </body>
 </html>
